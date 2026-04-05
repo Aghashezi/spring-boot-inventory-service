@@ -1,0 +1,33 @@
+package com.shahzad.inventory.admin.controller;
+
+import com.shahzad.inventory.dealer.entity.Dealer;
+import com.shahzad.inventory.dealer.repository.DealerRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/admin")
+@RequiredArgsConstructor
+@Tag(name = "Admin", description = "Admin APIs")
+public class AdminController {
+    private final DealerRepository dealerRepository;
+
+    @GetMapping("/dealers/countBySubscription")
+    @PreAuthorize("hasRole('GLOBAL_ADMIN')")
+    @Operation(summary = "Get global count of dealers by subscription type")
+    public ResponseEntity<Map<String, Long>> countBySubscription() {
+        Map<String, Long> result = new HashMap<>();
+        result.put("BASIC", dealerRepository.countBySubscriptionType(Dealer.SubscriptionType.BASIC));
+        result.put("PREMIUM", dealerRepository.countBySubscriptionType(Dealer.SubscriptionType.PREMIUM));
+        return ResponseEntity.ok(result);
+    }
+}
